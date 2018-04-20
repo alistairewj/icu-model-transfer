@@ -94,7 +94,7 @@ def get_design_matrix(df, time_dict, pt_id_col='icustay_id', W=8, W_extra=24):
     # get the hardcoded variable names
     var_min, var_max, var_first, var_last, var_sum, var_extend = vars_of_interest()
 
-    tmp = np.asarray(time_dict.items()).astype(int)
+    tmp = np.asarray(list(time_dict.items())).astype(int)
     N = tmp.shape[0]
 
     M = W+W_extra
