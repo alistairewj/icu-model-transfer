@@ -61,7 +61,7 @@ SELECT
 
   , case when pat.gender = 'F' then 1 else 0 end as is_female
   -- use lowest to replace ages > 89 with 90
-  , LOWEST(
+  , LEAST(
       ROUND( (CAST(co.intime AS DATE) - CAST(pat.dob AS DATE))  / 365.242, 4)
       , 90
     ) AS age
@@ -144,5 +144,4 @@ LEFT JOIN surgflag sf
   ON co.icustay_id = sf.icustay_id
 LEFT JOIN vd
   ON co.icustay_id = vd.icustay_id
-WHERE co.excluded = 0
 ORDER BY co.icustay_id;
