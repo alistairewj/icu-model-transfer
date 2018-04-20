@@ -59,7 +59,7 @@ select
   , AVG(lab.SODIUM) as SODIUM
   , AVG(lab.WBC) as WBC
 
-  , AVG(uo.UrineOutput)
+  , SUM(uo.UrineOutput) as urineoutput
 -- source from our "base" cohort
 from tr_cohort tr
 -- add in every hour for their icu stay
