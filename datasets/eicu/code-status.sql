@@ -1,6 +1,6 @@
 -- code status in first 48 hours
-DROP TABLE IF EXISTS tr_codestatus CASCADE;
-CREATE TABLE tr_codestatus AS
+DROP TABLE IF EXISTS tr_code_status CASCADE;
+CREATE TABLE tr_code_status AS
 select
     co.patientunitstayid
   , cpg.cplitemoffset AS chartoffset

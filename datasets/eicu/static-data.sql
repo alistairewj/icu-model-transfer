@@ -21,6 +21,8 @@ with cs as
 , aiva as
 (
   select patientunitstayid, apachescore, predictedhospitalmortality
+    -- actual vent days is an integer truncated at 30
+    , actualventdays::INTEGER as ventdays
   from apachepatientresult
   where apacheversion = 'IVa'
 )
@@ -34,6 +36,7 @@ select
   , ceil((co.dischoffset - co.admitoffset)/60.0) as dischtime_hours
   , co.deathtime_hours
   , co.hospital_expire_flag as death
+  , aiva.ventdays
 
   -- code status
   , ceil((cs.chartoffset-co.admitoffset)/60.0) as censortime_hours
@@ -50,20 +53,23 @@ select
     else cast(pat.age as NUMERIC)
     end as age
   , case when pat.ethnicity = 'African American' then 1 else 0 end as race_black
-  , case when adm.ethnicity = 'Hispanic' then 1 else 0 end as race_hispanic
-  , case when adm.ethnicity = 'Asian' then 1 else 0 end as race_asian
-  , case when adm.ethnicity not in
+  , case when pat.ethnicity = 'Hispanic' then 1 else 0 end as race_hispanic
+  , case when pat.ethnicity = 'Asian' then 1 else 0 end as race_asian
+  , case when pat.ethnicity not in
   (
       'African American', 'Hispanic', 'Asian'
   ) then 1 else 0 end as race_other
 
   , coalesce(apv.electivesurgery, 0) as electivesurgery
 
-from patient pat
+from tr_cohort co
+INNER JOIN patient pat
+  ON co.patientunitstayid = pat.patientunitstayid
+LEFT JOIN cs
+  ON co.patientunitstayid = cs.patientunitstayid
 -- apache score
 left join aiva
-  on pat.patientunitstayid = aiva.patientunitstayid
-
--- apache comorbidity components + diabetes flag
+  on co.patientunitstayid = aiva.patientunitstayid
+-- apache elective surgery flag
 left join APACHEPREDVAR apv
-  on pat.patientunitstayid = apv.patientunitstayid;
+  on co.patientunitstayid = apv.patientunitstayid;

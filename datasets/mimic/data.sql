@@ -5,10 +5,10 @@
 --  Columns: M features
 -- the "hr" column is the integer hour since ICU admission
 -- it can be negative since some labs are measured before ICU admission
-DROP TABLE IF EXISTS mp_data CASCADE;
-CREATE TABLE mp_data as
+DROP TABLE IF EXISTS tr_data CASCADE;
+CREATE TABLE tr_data as
 select
-    mp.icustay_id
+    tr.icustay_id
   , ih.hr
   -- vitals
   , AVG(vi.HeartRate) as HeartRate
@@ -59,10 +59,10 @@ select
 
   , AVG(uo.UrineOutput)
 -- source from our "base" cohort
-from mp_cohort mp
+from tr_cohort tr
 -- add in every hour for their icu stay
 inner join icustay_hours ih
-  on mp.icustay_id = ih.icustay_id
+  on tr.icustay_id = ih.icustay_id
 -- now left join to all the data tables using the hours
 left join pivoted_vital vi
   on  ih.icustay_id = vi.icustay_id
@@ -77,13 +77,13 @@ left join pivoted_uo uo
   and ih.endtime - interval '1' hour < uo.charttime
   and ih.endtime >= uo.charttime
 left join pivoted_bg_art bg
-  on  mp.hadm_id = bg.hadm_id
+  on  tr.hadm_id = bg.hadm_id
   and ih.endtime - interval '1' hour < bg.charttime
   and ih.endtime >= bg.charttime
 left join pivoted_lab lab
-  on  mp.hadm_id = lab.hadm_id
+  on  tr.hadm_id = lab.hadm_id
   and ih.endtime - interval '1' hour < lab.charttime
   and ih.endtime >= lab.charttime
-where mp.excluded = 0
-group by mp.icustay_id, ih.hr
-order by mp.icustay_id, ih.hr;
+where tr.excluded = 0
+group by tr.icustay_id, ih.hr
+order by tr.icustay_id, ih.hr;

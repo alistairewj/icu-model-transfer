@@ -1,5 +1,5 @@
-DROP TABLE IF EXISTS mp_code_status;
-CREATE TABLE mp_code_status AS
+DROP TABLE IF EXISTS tr_code_status;
+CREATE TABLE tr_code_status AS
 with t1 as
 (
   select icustay_id, charttime
@@ -36,4 +36,4 @@ select ie.icustay_id
   , t1.DNCPR
 from icustays ie
 left join t1
-  on ie.icustay_id = t1.icustay_id
+  on ie.icustay_id = t1.icustay_id;

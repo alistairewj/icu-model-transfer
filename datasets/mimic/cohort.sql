@@ -55,7 +55,7 @@ with ce as
     as exclusion_organ_donor
 
   , CASE
-      WHEN ROW_NUMBER() OVER (PARTITION BY subject_id ORDER BY intime) > 1 THEN 1
+      WHEN ROW_NUMBER() OVER (PARTITION BY ie.subject_id ORDER BY ie.intime) > 1 THEN 1
       WHEN (ce.outtime_hr-ce.intime_hr) <= interval '4' hour then 1
     else 0 end as exclusion_by_apache
 
@@ -109,4 +109,4 @@ select
   , co.exclusion_by_apache
 ) as excluded
 from co
-order by ie.icustay_id;
+order by co.icustay_id;

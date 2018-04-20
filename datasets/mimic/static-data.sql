@@ -32,6 +32,15 @@ with cs as
     and se.transfertime < ie.intime + interval '1' day
   group by ie.icustay_id
 )
+, vd as
+(
+  select icustay_id
+    , LEAST(
+        CEIL(sum(duration_hours)/24.0)::INTEGER
+        , 30::INTEGER) as ventdays
+  FROM ventdurations
+  group by icustay_id
+)
 SELECT
   co.icustay_id
 
@@ -133,5 +142,7 @@ LEFT JOIN cs
   ON co.icustay_id = cs.icustay_id
 LEFT JOIN surgflag sf
   ON co.icustay_id = sf.icustay_id
+LEFT JOIN vd
+  ON co.icustay_id = vd.icustay_id
 WHERE co.excluded = 0
 ORDER BY co.icustay_id;
