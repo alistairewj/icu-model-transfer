@@ -5,6 +5,7 @@ CREATE TABLE tr_time_random AS
 with ra as
 (
   select icustay_id
+    , excluded
     , random() as random_fraction
   from tr_cohort co
 )
