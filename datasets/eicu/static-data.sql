@@ -28,6 +28,7 @@ with cs as
 )
 select
   pat.patientunitstayid -- ICU stay identifier
+  , pat.hospitalid
 
   -- ======== --
   -- Outcomes --

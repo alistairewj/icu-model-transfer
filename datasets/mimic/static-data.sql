@@ -43,7 +43,8 @@ with cs as
 )
 SELECT
   co.icustay_id
-
+  , 0::SMALLINT as hospitalid
+  
   -- ======== --
   -- Outcomes --
   -- ======== --
