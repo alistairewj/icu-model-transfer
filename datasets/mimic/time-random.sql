@@ -9,16 +9,25 @@ with ra as
     , random() as random_fraction
   from tr_cohort co
 )
+, tm as
+(
+  select
+      ra.icustay_id
+    , sd.censortime_hours, sd.deathtime_hours, sd.dischtime_hours
+    , ra.random_fraction
+    , GREATEST(FLOOR(
+          ra.random_fraction*(LEAST(sd.censortime_hours, sd.deathtime_hours, sd.dischtime_hours)-2)
+        ), 4) as windowtime_hours
+  from ra
+  LEFT JOIN tr_static_data sd
+    ON ra.icustay_id = sd.icustay_id
+  where ra.excluded = 0
+)
+-- finally, filter out patients who died/were censored before 4 hours
 select
-    ra.icustay_id
-  , sd.censortime_hours, sd.deathtime_hours, sd.dischtime_hours
-  , ra.random_fraction
-  , GREATEST(
-      FLOOR(
-        ra.random_fraction*LEAST(sd.censortime_hours, sd.deathtime_hours, sd.dischtime_hours)
-      ) - 2
-      , 4) as windowtime
-from ra
-LEFT JOIN tr_static_data sd
-  ON ra.icustay_id = sd.icustay_id
-where ra.excluded = 0;
+  tm.icustay_id
+, tm.censortime_hours, tm.deathtime_hours, tm.dischtime_hours
+, tm.random_fraction
+, tm.windowtime_hours
+FROM tm
+WHERE tm.windowtime_hours <= LEAST(tm.censortime_hours, tm.deathtime_hours, tm.dischtime_hours);
