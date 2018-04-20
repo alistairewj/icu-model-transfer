@@ -1,3 +1,6 @@
+DROP TABLE IF EXISTS tr_time_day1 CASCADE;
+CREATE TABLE tr_time_day1 AS
+
 select
     co.icustay_id
   , sd.censortime_hours, sd.deathtime_hours, sd.dischtime_hours

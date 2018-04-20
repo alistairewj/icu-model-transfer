@@ -1,5 +1,7 @@
 select setseed(0.1);
 
+DROP TABLE IF EXISTS tr_time_random CASCADE;
+CREATE TABLE tr_time_random AS
 with ra as
 (
   select icustay_id
