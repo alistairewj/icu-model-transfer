@@ -37,7 +37,7 @@ select
   , ceil((co.dischoffset - co.admitoffset)/60.0) as dischtime_hours
   , co.deathtime_hours
   , co.hospital_expire_flag as death
-  , aiva.ventdays
+  , COALESCE(aiva.ventdays, 0) as ventdays
 
   -- code status
   , ceil((cs.chartoffset-co.admitoffset)/60.0) as censortime_hours

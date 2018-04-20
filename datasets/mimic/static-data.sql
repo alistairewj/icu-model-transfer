@@ -44,7 +44,7 @@ with cs as
 SELECT
   co.icustay_id
   , 0::SMALLINT as hospitalid
-  
+
   -- ======== --
   -- Outcomes --
   -- ======== --
@@ -52,6 +52,7 @@ SELECT
   , ceil(extract(epoch from (co.outtime - co.intime))/60.0/60.0) as dischtime_hours
   , ceil(extract(epoch from (adm.deathtime - co.intime))/60.0/60.0) as deathtime_hours
   , case when adm.deathtime is null then 0 else 1 end as death
+  , COALESCE(vd.ventdays, 0) as ventdays
 
   -- code status
   , ceil(extract(epoch from cs.censortime-co.intime )/60.0/60.0) as censortime_hours
