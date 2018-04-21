@@ -12,8 +12,14 @@ with pt as
   , hospitaldischargeoffset
   , unitdischargeoffset
   , hospitaldischargestatus
-  , (case when hospitaldischargestatus = 'Expired' then 1 else 0 end)::smallint
+  , unitdischargestatus
+  , (case when hospitaldischargestatus = 'Expired' then 1
+        when unitdischargestatus = 'Expired' then 1
+      else 0 end)::smallint
       as hospital_expire_flag
+  , (case when unitdischargestatus = 'Expired' then 1
+      else 0 end)::smallint
+      as unit_expire_flag
   , hospitaladmityear, hospitaldischargeyear
   , case when pt.age = '' then null
       else REPLACE(age, '>','')
@@ -66,14 +72,17 @@ with pt as
   , vw1.hospital_expire_flag
   , (adm.dischoffset - adm.admitoffset)/60.0/24.0 as icu_los
   , (vw1.hospitaldischargeoffset-adm.admitoffset)/60.0/24.0 as hosp_los
-  , case when vw1.hospital_expire_flag = 1
-        then (vw1.hospitaldischargeoffset-adm.admitoffset)/60.0/24.0
+  , case
+      when vw1.unit_expire_flag = 1
+        then (adm.dischoffset-adm.admitoffset)/60.0
+      when vw1.hospital_expire_flag = 1
+        then (vw1.hospitaldischargeoffset-adm.admitoffset)/60.0
       else null end
      as deathtime_hours
 
   , case when age < 16 then 1 else 0 end as exclusion_non_adult
   , case when adm.admitoffset is null then 1
-        when vw1.hospitaldischargestatus is null then 1
+        when coalesce(vw1.hospitaldischargestatus, vw1.unitdischargestatus) is null then 1
       else 0 end
     as exclusion_bad_data
   , 0 as exclusion_organ_donor
