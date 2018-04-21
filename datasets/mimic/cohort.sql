@@ -59,6 +59,9 @@ with ce as
       WHEN (ce.outtime_hr-ce.intime_hr) <= interval '4' hour then 1
     else 0 end as exclusion_by_apache
 
+  -- metavision flag
+  , (CASE WHEN ie.dbsource = 'carevue' THEN 0 ELSE 1 END)::SMALLINT as metavision
+
   -- the above flags are used to summarize patients excluded
   -- below flag is used to actually exclude patients in future queries
   , case  when round((cast(adm.admittime as date) - cast(pat.dob as date)) / 365.242, 4) <= 16 then 1
@@ -80,8 +83,10 @@ with ce as
     on ie.icustay_id = ce.icustay_id
 )
 select
-  co.subject_id, co.hadm_id, co.icustay_id
-, 0::SMALLINT as hospitalid
+co.subject_id, co.hadm_id, co.icustay_id
+-- hospitalid=1 is metavision
+-- hospitalid=0 is carevue
+, co.metavision as hospitalid
 , co.intime
 , co.outtime
 , co.age
