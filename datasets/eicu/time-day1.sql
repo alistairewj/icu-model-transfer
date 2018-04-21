@@ -8,4 +8,4 @@ from tr_cohort co
 LEFT JOIN tr_static_data sd
   ON co.patientunitstayid = sd.patientunitstayid
 where co.excluded = 0
-AND 24 <= LEAST(sd.censortime_hours, sd.deathtime_hours, sd.dischtime_hours);
+AND LEAST(sd.censortime_hours, sd.deathtime_hours, sd.dischtime_hours) >= 24;
