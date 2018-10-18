@@ -60,7 +60,11 @@ with ce as
     else 0 end as exclusion_by_apache
 
   -- metavision flag
-  , (CASE WHEN ie.dbsource = 'carevue' THEN 0 ELSE 1 END)::SMALLINT as metavision
+  , (CASE
+      WHEN ie.dbsource = 'metavision'
+        THEN 1
+      ELSE 0
+    END)::SMALLINT as metavision
 
   -- the above flags are used to summarize patients excluded
   -- below flag is used to actually exclude patients in future queries
